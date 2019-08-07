@@ -20,33 +20,47 @@ import Models exposing (Model)
 
 -- Debería darnos la url de la cancion en base al id
 urlById : String -> List Song -> String
-urlById idSearched songs =  (findSong (sameId idSearched) songs).url
+urlById idSearched songs =  (searchById idSearched songs).url
 
 sameId : String -> Song -> Bool
 sameId idSearched song = idSearched == song.id
 
+searchById : String -> List Song -> Song
+searchById idSearched songs = findSong (sameId idSearched) songs 
+
 -- Debería darnos las canciones que tengan ese texto en nombre o artista
+
 filterByName : String -> List Song -> List Song
-filterByName text songs = songs
+filterByName text songs = filter (sameNameOrArtist text) songs
+
+sameNameOrArtist : String -> Song -> Bool
+sameNameOrArtist text song = (text == song.name) || (text == song.artist)
 
 -- Recibe un id y tiene que likear/dislikear una cancion
 -- switchear song.liked
-toggleLike : String -> List Song -> List Song
-toggleLike id songs = songs
 
+toggleLike : String -> List Song -> List Song
+toggleLike id songs = (searchById id songs).liked => (searchById id songs).liked = False
+                   |= (searchById id songs).liked = True
+
+--if (searchById id songs).liked == True then (searchById id songs).liked = False else (searchById id songs).liked = True 
+    
 -- Esta funcion tiene que decir si una cancion tiene
 -- nuestro like o no, por ahora funciona mal...
 -- hay que arreglarla
+
 isLiked : Song  -> Bool
-isLiked song = False
+isLiked song = song.liked
 
 -- Recibe una lista de canciones y nos quedamos solo con las que
 -- tienen un like
+
 filterLiked : List Song -> List Song
-filterLiked songs = songs
+filterLiked songs = filter isLiked songs
 
 -- Agrega una cancion a la cola de reproduccion
 -- (NO es necesario preocuparse porque este una sola vez)
+
 addSongToQueue : Song -> List Song -> List Song
 addSongToQueue song queue = queue
 
