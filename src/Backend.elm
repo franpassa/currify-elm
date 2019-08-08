@@ -19,8 +19,8 @@ import Models exposing (Model)
 -- idFirst : List Song -> String
 
 -- Debería darnos la url de la cancion en base al id
+
 urlById : String -> List Song -> String
---urlById id songs = ""
 urlById idSearched songs =  (searchById idSearched songs).url
 
 sameId : String -> Song -> Bool
@@ -32,11 +32,10 @@ searchById idSearched songs = findSong (sameId idSearched) songs
 -- Debería darnos las canciones que tengan ese texto en nombre o artista
 
 filterByName : String -> List Song -> List Song
---filterByName text songs = songs
-filterByName text songs = List.filter (sameNameOrArtist (String.toLower text)) (List.map String.toLower songs)
+filterByName text songs = List.filter (sameNameOrArtist (String.toLower text)) songs
 
 sameNameOrArtist : String -> Song -> Bool
-sameNameOrArtist text song = String.contains text song.artist ||  String.contains text song.artist
+sameNameOrArtist text song = String.contains text (String.toLower song.name) || String.contains text (String.toLower song.artist)
 
 -- Recibe un id y tiene que likear/dislikear una cancion
 -- switchear song.liked
@@ -61,28 +60,24 @@ switchLike song = if isLiked song then { song | liked = False } else { song | li
 -- hay que arreglarla
 
 isLiked : Song  -> Bool
---isLiked song = False
 isLiked song = song.liked
 
 -- Recibe una lista de canciones y nos quedamos solo con las que
 -- tienen un like
 
 filterLiked : List Song -> List Song
---filterLiked songs = songs
 filterLiked songs = List.filter isLiked songs
 
 -- Agrega una cancion a la cola de reproduccion
 -- (NO es necesario preocuparse porque este una sola vez)
 
 addSongToQueue : Song -> List Song -> List Song
---addSongToQueue song queue = queue
-addSongToQueue song queue = song::queue
+addSongToQueue song queue = queue++[song]
 
 -- Saca una cancion de la cola
 -- (NO es necesario que se elimine una sola vez si esta repetida)
 
 removeSongFromQueue : String -> List Song -> List Song
---removeSongFromQueue id queue = queue
 removeSongFromQueue id queue = List.filter (diferentId id) queue
 
 diferentId : String -> Song -> Bool
@@ -91,8 +86,10 @@ diferentId idSearched song = not (sameId idSearched song)
 -- Hace que se reproduzca la canción que sigue y la saca de la cola
 
 playNextFromQueue : Model -> Model
-playNextFromQueue model = model
---playNextFromQueue model = nextQueue model 
+playNextFromQueue model = deleteFirst (playSong model (idFirst model.queue))
+
+deleteFirst : Model -> Model
+deleteFirst model = { model | queue = tailSafe model.queue }
 
 -------- Funciones Listas --------
 
